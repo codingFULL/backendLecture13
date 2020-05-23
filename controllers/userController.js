@@ -1,5 +1,4 @@
-// include node fs module
-var fs = require('fs');
+const dbConnection = require('../infrastucture/dataBaseConfig');
 
 exports.createUser = (req, res, next) => {
   const name = req.body.name;
@@ -15,18 +14,39 @@ exports.createUser = (req, res, next) => {
     email,
     password,
   };
-
-  fs.writeFile(
-    `./users/${name}-${Date.now().toString()}.txt`,
-    JSON.stringify(data),
-    function (err) {
-      if (err) throw err;
-      console.log('File is created successfully.');
+  dbConnection.pool.query(
+    'INSERT INTO usuario (name, lastname, age, email, password) VALUES ($1, $2, $3, $4, $5) ',
+    Object.values(data),
+    (error, resp) => {
+      if (error) {
+        res.status(400).json({
+          message: 'Usuario No creado',
+          id: Date.now(),
+        });
+      }
+      res.status(200).json({
+        message: 'Usuario creado',
+        user: resp.rows,
+        id: Date.now(),
+      });
     }
   );
+};
 
-  res.status(200).json({
-    message: 'Usuario creado',
-    id: Date.now(),
-  });
+exports.getUserById = (req, res, next) => {
+  const userId = req.params.id;
+
+  dbConnection.pool.query(
+    'SELECT * FROM usuario WHERE userid = $1',
+    [userId],
+    (error, results) => {
+      if (error) {
+        res.status(400).json({
+          message: 'Usuario No encontrado',
+          id: Date.now(),
+        });
+      }
+      res.status(200).json(results.rows);
+    }
+  );
 };
