@@ -50,3 +50,15 @@ exports.getUserById = (req, res, next) => {
     }
   );
 };
+
+exports.getAllUsers = (req, res, next) => {
+  dbConnection.pool.query('SELECT * FROM usuario', (error, results) => {
+    if (error) {
+      res.status(400).json({
+        message: 'Usuario No encontrado',
+        id: Date.now(),
+      });
+    }
+    res.status(200).json(results.rows);
+  });
+};

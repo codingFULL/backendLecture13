@@ -24,6 +24,9 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json());
 
+// POST /user
+// GET /user
+// GET /user/:id
 app.use(userRoute);
 
 var server = app.listen(process.env.PORT || 8080, () => {
